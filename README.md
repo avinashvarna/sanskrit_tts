@@ -10,6 +10,10 @@ Note that the TTS API will incur a cost if the free quota is exceeded ([details]
 ## Installation
 This package has been developed on python 3.8 but should work with any version of python >= 3.6.
 ```bash
+pip install sanskrit_tts
+```
+To install from the master branch of the git repo:
+```bash
 pip install git+https://github.com/avinashvarna/sanskrit_tts.git
 ```
 For an editable installation (to modify the code and experiment)
