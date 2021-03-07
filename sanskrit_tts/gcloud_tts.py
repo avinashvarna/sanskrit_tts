@@ -26,6 +26,16 @@ default_audio_config = AudioConfig(
         speaking_rate=0.8
     )
 
+transliteration_map = {
+    'bn-IN': sanscript.BENGALI,
+    'gu-IN': sanscript.GUJARATI,
+    'hi-IN': sanscript.DEVANAGARI,
+    'kn-IN': sanscript.KANNADA,
+    'ml-IN': sanscript.MALAYALAM,
+    'ta-IN': sanscript.TAMIL,
+    'te-IN': sanscript.TELUGU,
+    }
+
 
 def synthesize_sentence(sentence: str,
                         voice: VoiceSelectionParams = default_voice,
@@ -37,8 +47,9 @@ def synthesize_sentence(sentence: str,
         https://github.com/googleapis/python-texttospeech/
     """
     client = TextToSpeechClient()
+    trans_tgt = transliteration_map[voice.language_code]
     text = sanscript.transliterate(sentence, sanscript.DEVANAGARI,
-                                   sanscript.KANNADA)
+                                   trans_tgt)
     input_text = SynthesisInput(text=text)
 
     response = client.synthesize_speech(
