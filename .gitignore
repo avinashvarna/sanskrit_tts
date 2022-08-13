@@ -1,4 +1,7 @@
 *.json
+*.mp3
+examples/
+sanskrit_tts/_version.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
