@@ -63,7 +63,7 @@ class BhashiniProxy(TTSBase):
             "voice": self.voice.value,
             "modify_visargas": modify_visargas
         }
-        response = requests.post(self.url, data=data)
+        response = requests.post(self.url, json=data)
         response.raise_for_status()
         audio = AudioSegment.from_file(io.BytesIO(response.content))
         return audio
