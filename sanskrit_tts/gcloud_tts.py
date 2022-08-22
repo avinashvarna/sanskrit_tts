@@ -78,23 +78,3 @@ def synthesize_sentence(
 
     audio = AudioSegment.from_file(io.BytesIO(response.audio_content))
     return audio
-
-
-def synthesize_text(
-    text: str,
-    voice: VoiceSelectionParams = default_voice,
-    audio_config: AudioConfig = default_audio_config,
-    inter_sentence_duration_ms: int = 100,
-) -> AudioSegment:
-    silence = AudioSegment.silent(inter_sentence_duration_ms)
-    sentences = text.split("।")
-
-    audios = []
-    for sent in sentences:
-        sent = sent.strip()
-        if sent == "":
-            continue
-        audios.append(synthesize_sentence(sent, voice, audio_config))
-        audios.append(silence)
-
-    return sum(audios)
