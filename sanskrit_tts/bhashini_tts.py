@@ -3,20 +3,17 @@
 TTS Client for Bhashini API https://tts.bhashini.ai/
 
 """
+import io
 import json
 import logging
-from urllib import response
-from urllib.error import HTTPError
-
-import requests
-import io
-
 from dataclasses import dataclass
 from enum import IntEnum
+
+import requests
 from pydub import AudioSegment
 
-from .util import transliterate_text
 from .base import TTSBase
+from .util import transliterate_text
 
 
 class BhashiniVoice(IntEnum):
