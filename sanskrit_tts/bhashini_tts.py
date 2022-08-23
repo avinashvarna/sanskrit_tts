@@ -3,6 +3,7 @@
 TTS Client for Bhashini API https://tts.bhashini.ai/
 
 """
+import json
 import logging
 from urllib import response
 from urllib.error import HTTPError
@@ -51,7 +52,7 @@ class BhashiniTTS(TTSBase):
             response = requests.post(self.url, headers=headers, json=data)
             response.raise_for_status()
         except Exception as e:
-            logging.info(data)
+            logging.info(json.dumps(data, indent=1, ensure_ascii=False))
             raise
         return response
 
