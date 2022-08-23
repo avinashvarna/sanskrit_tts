@@ -2,8 +2,13 @@
 
 #TODO - Usage example
 """
-from ._version import __version__, version
-from ._version import __version_tuple__, version_tuple
+
+try:
+    from ._version import __version__, version
+    from ._version import __version_tuple__, version_tuple
+except ImportError:
+    pass
+
 from .bhashini_tts import BhashiniProxy
 
 

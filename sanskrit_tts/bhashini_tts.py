@@ -3,16 +3,17 @@
 TTS Client for Bhashini API https://tts.bhashini.ai/
 
 """
-from urllib import response
-import requests
 import io
-
+import json
+import logging
 from dataclasses import dataclass
 from enum import IntEnum
+
+import requests
 from pydub import AudioSegment
 
-from .util import transliterate_text
 from .base import TTSBase
+from .util import transliterate_text
 
 
 class BhashiniVoice(IntEnum):
@@ -31,7 +32,6 @@ class BhashiniTTS(TTSBase):
         self, text: str, input_encoding: str = None, modify_visargas: bool = True
     ) -> AudioSegment:
         response = self._synthesis_response(text, input_encoding, modify_visargas)
-        response.raise_for_status()
         audio = AudioSegment.from_file(io.BytesIO(response.content))
         return audio
     
@@ -45,7 +45,12 @@ class BhashiniTTS(TTSBase):
         if self.api_key is not None:
             headers["X-API-KEY"] = self.api_key
         data = {"languageId": "kn", "voiceId": self.voice.value, "text": text}
-        response = requests.post(self.url, headers=headers, json=data)
+        try:
+            response = requests.post(self.url, headers=headers, json=data)
+            response.raise_for_status()
+        except Exception as e:
+            logging.info(json.dumps(data, indent=1, ensure_ascii=False))
+            raise
         return response
 
 

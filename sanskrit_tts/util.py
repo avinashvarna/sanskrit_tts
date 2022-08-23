@@ -65,8 +65,10 @@ def transliterate_text(
     --------
     adapt_visargas
     """
-    text = sanscript.transliterate(text, input_encoding, sanscript.SLP1)
     if modify_visargas:
+        text = sanscript.transliterate(text, input_encoding, sanscript.SLP1)
         text = adapt_visargas(text)
-    text = sanscript.transliterate(text, sanscript.SLP1, output_encoding)
+        text = sanscript.transliterate(text, sanscript.SLP1, output_encoding)
+    else:
+        text = sanscript.transliterate(text, _from=input_encoding, _to=output_encoding)
     return text
