@@ -3,7 +3,10 @@
 TTS Client for Bhashini API https://tts.bhashini.ai/
 
 """
+import logging
 from urllib import response
+from urllib.error import HTTPError
+
 import requests
 import io
 
@@ -31,7 +34,6 @@ class BhashiniTTS(TTSBase):
         self, text: str, input_encoding: str = None, modify_visargas: bool = True
     ) -> AudioSegment:
         response = self._synthesis_response(text, input_encoding, modify_visargas)
-        response.raise_for_status()
         audio = AudioSegment.from_file(io.BytesIO(response.content))
         return audio
     
@@ -45,7 +47,12 @@ class BhashiniTTS(TTSBase):
         if self.api_key is not None:
             headers["X-API-KEY"] = self.api_key
         data = {"languageId": "kn", "voiceId": self.voice.value, "text": text}
-        response = requests.post(self.url, headers=headers, json=data)
+        try:
+            response = requests.post(self.url, headers=headers, json=data)
+            response.raise_for_status()
+        except Exception as e:
+            logging.info(data)
+            raise
         return response
 
 
