@@ -72,7 +72,7 @@ def transliterate_text(
         text = sanscript.transliterate(text, sanscript.SLP1, output_encoding)
     else:
         text = sanscript.transliterate(text, _from=input_encoding, _to=output_encoding)
-        if visarga_approximation not in [VisargaApproximation.H, None]:
+        if visarga_approximation not in [VisargaApproximation.AHA, None]:
             text = sanscript.SCHEMES[output_encoding].approximate_visargas(text, mode=visarga_approximation)
     if output_encoding not in [sanscript.DEVANAGARI]:
         text = sanscript.SCHEMES[output_encoding].force_lazy_anusvaara(text)
