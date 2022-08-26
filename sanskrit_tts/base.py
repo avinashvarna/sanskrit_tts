@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import abc
+
+from indic_transliteration.sanscript.schemes import VisargaApproximation
 from pydub import AudioSegment
 
 
@@ -10,7 +12,7 @@ class TTSBase(abc.ABC):
 
     @abc.abstractmethod
     def synthesize(
-        self, text: str, input_encoding: str = None, modify_visargas: bool = True
+        self, text: str, input_encoding: str = None, visarga_approximation: int = VisargaApproximation.H
     ) -> AudioSegment:
         """Synthesize the provided text using TTS and return the audio
 

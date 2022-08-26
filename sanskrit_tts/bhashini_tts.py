@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 
 import requests
+from indic_transliteration.sanscript.schemes import VisargaApproximation
 from pydub import AudioSegment
 
 from .base import TTSBase
@@ -29,17 +30,17 @@ class BhashiniTTS(TTSBase):
     api_key: str = None
 
     def synthesize(
-        self, text: str, input_encoding: str = None, modify_visargas: bool = True
+        self, text: str, input_encoding: str = None, visarga_approximation: int = VisargaApproximation.H
     ) -> AudioSegment:
-        response = self._synthesis_response(text, input_encoding, modify_visargas)
+        response = self._synthesis_response(text, input_encoding, visarga_approximation)
         audio = AudioSegment.from_file(io.BytesIO(response.content))
         return audio
     
     def _synthesis_response(
-        self, text: str, input_encoding: str = None, modify_visargas: bool = True
+        self, text: str, input_encoding: str = None, visarga_approximation: int = VisargaApproximation.H
     ):
         text = transliterate_text(
-            text, input_encoding=input_encoding, modify_visargas=modify_visargas
+            text, input_encoding=input_encoding, visarga_approximation=visarga_approximation
         )
         headers = {"accept": "audio/mpeg"}
         if self.api_key is not None:
@@ -60,13 +61,13 @@ class BhashiniProxy(TTSBase):
     voice: BhashiniVoice = BhashiniVoice.FEMALE2
     
     def synthesize(
-        self, text: str, input_encoding: str = None, modify_visargas: bool = True
+        self, text: str, input_encoding: str = None, visarga_approximation: int = VisargaApproximation.H
     ) -> AudioSegment:
         data = {
             "text": text,
             "input_encoding": input_encoding,
             "voice": self.voice.value,
-            "modify_visargas": modify_visargas
+            "visarga_approximation": visarga_approximation
         }
         response = requests.post(self.url, json=data)
         response.raise_for_status()

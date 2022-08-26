@@ -13,6 +13,7 @@ from google.cloud.texttospeech import VoiceSelectionParams, AudioConfig
 from google.cloud.texttospeech import AudioEncoding, SynthesisInput
 
 from indic_transliteration import sanscript
+from indic_transliteration.sanscript.schemes import VisargaApproximation
 from pydub import AudioSegment
 
 from .util import transliterate_text
@@ -63,14 +64,14 @@ class GCloudTTS(TTSBase):
         return audio
 
     def synthesize(
-        self, text: str, input_encoding: str = None, modify_visargas: bool = True
+        self, text: str, input_encoding: str = None, visarga_approximation: int = VisargaApproximation.H
     ) -> AudioSegment:
         trans_tgt = transliteration_map[self.voice.language_code]
         text = transliterate_text(
             text,
             input_encoding=input_encoding,
             output_encoding=trans_tgt,
-            modify_visargas=modify_visargas,
+            visarga_approximation=visarga_approximation,
         )
         sentences = text.split(".")
 
