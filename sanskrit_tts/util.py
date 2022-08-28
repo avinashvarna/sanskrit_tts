@@ -24,7 +24,7 @@ def transliterate_text(
         encoding of input text, by default None. Will be auto-detected if None
     output_encoding : str, optional
         encoding of output, by default sanscript.KANNADA
-    visarga_approximation : str, optional
+    visarga_approximation : int, optional
         adapt visargas for pronunciation, by default - replacement with h
 
     Returns
