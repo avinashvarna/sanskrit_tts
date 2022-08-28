@@ -6,13 +6,18 @@ Convert Sanskrit text to speech
 """
 
 import io
+from dataclasses import dataclass
 
 from google.cloud.texttospeech import TextToSpeechClient, SsmlVoiceGender
 from google.cloud.texttospeech import VoiceSelectionParams, AudioConfig
 from google.cloud.texttospeech import AudioEncoding, SynthesisInput
 
 from indic_transliteration import sanscript
+from indic_transliteration.sanscript.schemes import VisargaApproximation
 from pydub import AudioSegment
+
+from .util import transliterate_text
+from .base import TTSBase
 
 
 default_voice = VoiceSelectionParams(
@@ -32,69 +37,51 @@ transliteration_map = {
 }
 
 
-def adapt_visargas(text: str) -> str:
-    replacements = [
-        ("aH", "aha"),
-        ("AH", "Aha"),
-        ("iH", "ihi"),
-        ("IH", "Ihi"),
-        ("uH", "uhu"),
-        ("UH", "Uhu"),
-        ("FH", "Fhi"),
-        ("eH", "ehe"),
-        ("EH", "ehi"),
-        ("oH", "oho"),
-        ("OH", "Ohu"),
-    ]
-    for old, new in replacements:
-        text = text.replace(old, new)
-    return text
+@dataclass
+class GCloudTTS(TTSBase):
+    voice: VoiceSelectionParams = default_voice
+    audio_config: AudioConfig = default_audio_config
+    inter_sentence_duration_ms: int = 100
 
+    def synthesize_sentence(self, sentence: str,) -> AudioSegment:
+        """Synthesizes speech from the input string of text.
+    
+            Adapted from Google sample at:
+            https://github.com/googleapis/python-texttospeech/
+        """
+        client = TextToSpeechClient()
+        input_text = SynthesisInput(text=sentence)
 
-def synthesize_sentence(
-    sentence: str,
-    voice: VoiceSelectionParams = default_voice,
-    audio_config: AudioConfig = default_audio_config,
-    modify_visargas: bool = True,
-) -> AudioSegment:
-    """Synthesizes speech from the input string of text.
+        response = client.synthesize_speech(
+            request={
+                "input": input_text,
+                "voice": self.voice,
+                "audio_config": self.audio_config,
+            }
+        )
 
-        Adapted from Google sample at:
-        https://github.com/googleapis/python-texttospeech/
-    """
-    client = TextToSpeechClient()
-    trans_tgt = transliteration_map[voice.language_code]
-    # text = sanscript.transliterate(sentence, sanscript.DEVANAGARI,
-    #                                trans_tgt)
-    text = sanscript.transliterate(sentence, sanscript.DEVANAGARI, sanscript.SLP1)
-    if modify_visargas:
-        text = adapt_visargas(text)
-    text = sanscript.transliterate(text, sanscript.SLP1, trans_tgt)
-    input_text = SynthesisInput(text=text)
+        audio = AudioSegment.from_file(io.BytesIO(response.audio_content))
+        return audio
 
-    response = client.synthesize_speech(
-        request={"input": input_text, "voice": voice, "audio_config": audio_config}
-    )
+    def synthesize(
+        self, text: str, input_encoding: str = None, visarga_approximation: int = VisargaApproximation.H
+    ) -> AudioSegment:
+        trans_tgt = transliteration_map[self.voice.language_code]
+        text = transliterate_text(
+            text,
+            input_encoding=input_encoding,
+            output_encoding=trans_tgt,
+            visarga_approximation=visarga_approximation,
+        )
+        sentences = text.split(".")
 
-    audio = AudioSegment.from_file(io.BytesIO(response.audio_content))
-    return audio
+        silence = AudioSegment.silent(self.inter_sentence_duration_ms)
+        audios = []
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if sentence == "":
+                continue
+            audios.append(self.synthesize_sentence(sentence))
+            audios.append(silence)
 
-
-def synthesize_text(
-    text: str,
-    voice: VoiceSelectionParams = default_voice,
-    audio_config: AudioConfig = default_audio_config,
-    inter_sentence_duration_ms: int = 100,
-) -> AudioSegment:
-    silence = AudioSegment.silent(inter_sentence_duration_ms)
-    sentences = text.split("।")
-
-    audios = []
-    for sent in sentences:
-        sent = sent.strip()
-        if sent == "":
-            continue
-        audios.append(synthesize_sentence(sent, voice, audio_config))
-        audios.append(silence)
-
-    return sum(audios)
+        return sum(audios)
