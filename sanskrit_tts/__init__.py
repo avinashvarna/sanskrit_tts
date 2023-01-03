@@ -13,4 +13,5 @@ from .bhashini_tts import BhashiniProxy
 
 
 def default_tts():
+    """ Default TTS option"""
     return BhashiniProxy()

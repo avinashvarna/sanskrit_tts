@@ -1,0 +1,7 @@
+sanskrit_tts
+indic_transliteration
+flask
+flask_restx
+flask_cors
+jsonpickle
+google-cloud-datastore
