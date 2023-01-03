@@ -47,7 +47,7 @@ class BhashiniTTS(TTSBase):
             headers["X-API-KEY"] = self.api_key
         data = {"languageId": "kn", "voiceId": self.voice.value, "text": text}
         try:
-            response = requests.post(self.url, headers=headers, json=data, timeout=5)
+            response = requests.post(self.url, headers=headers, json=data, timeout=60)
             response.raise_for_status()
         except Exception:
             logging.info(json.dumps(data, indent=1, ensure_ascii=False))
@@ -66,10 +66,10 @@ class BhashiniProxy(TTSBase):
         data = {
             "text": text,
             "input_encoding": input_encoding,
-            "voice": self.voice.value,
+            "voice": int(self.voice),
             "visarga_approximation": int(visarga_approximation)
         }
-        response = requests.post(self.url, json=data, timeout=5)
+        response = requests.post(self.url, json=data, timeout=60)
         response.raise_for_status()
         audio = AudioSegment.from_file(io.BytesIO(response.content))
         return audio

@@ -1,7 +1,6 @@
 """ Test Bhashini Proxy API"""
 from io import BytesIO
 
-from indic_transliteration.sanscript import DEVANAGARI
 from indic_transliteration.sanscript.schemes import VisargaApproximation
 from pydub import AudioSegment
 
@@ -16,7 +15,7 @@ def test_bhashini_proxy_api():
     url = "/v1/synthesize/"
     data = {
         "text": text,
-        "input_encoding": DEVANAGARI,
+        "input_encoding": None,
         "voice": int(BhashiniVoice.FEMALE2),
         "visarga_approximation": int(VisargaApproximation.AHA),
     }
@@ -26,3 +25,7 @@ def test_bhashini_proxy_api():
     response = test_response.data
     audio = AudioSegment.from_file(BytesIO(response))
     audio.export("proxy.mp3")
+
+
+if __name__ == "__main__":
+    test_bhashini_proxy_api()

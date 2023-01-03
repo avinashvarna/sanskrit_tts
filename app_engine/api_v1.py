@@ -27,9 +27,19 @@ api = Api(
 )
 
 
-api_key = os.environ.get("BHASHINI_API_KEY", None)
+api_key = None
+if "BHASHINI_API_KEY" in os.environ:
+    api_key = os.environ["BHASHINI_API_KEY"]
+else:
+    # Get it from the datastore
+    from google.cloud import datastore
+    client = datastore.Client()
+    kind = 'api_key'
+    name = 'bhashini_api_key'
+    key = client.key(kind, name)
+    entity = client.get(key)
+    api_key = entity["api_key"]
 if api_key is None:
-    # TODO
     raise Exception("Bhashini API key not found")
 
 
@@ -51,7 +61,7 @@ synthesize_parser.add_argument(
     type=str,
     default=None,
     help="Encoding of the text",
-    choices=list(sanscript.SCHEMES.keys()),
+    choices=list(sanscript.SCHEMES.keys()) + [None],
 )
 synthesize_parser.add_argument(
     "voice",

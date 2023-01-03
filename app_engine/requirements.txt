@@ -4,4 +4,4 @@ flask
 flask_restx
 flask_cors
 jsonpickle
-werkzeug
+google-cloud-datastore
