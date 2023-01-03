@@ -68,7 +68,5 @@ audio = TTS.synthesize(text)
 audio.export("sanskrit_speech.mp3")
 ```
 
-See the [example notebook](https://github.com/avinashvarna/sanskrit_tts/blob/main/examples/simple_example.ipynb) for a simple example of converting text from Sanskrit Wikipedia to the corresponding audio.
-
 ## How it works
 Both Google Cloud TTS and Bhashini Text-to-Speech do not support Sanskrit yet. As a workaround, this library uses other languages for speech to text conversion. Kannada is used by default for this workaround. Any other language/voice supported by the corresponding TTS API can be used by changing the appropriate parameters while instantiating the TTS class, and the results will vary. A complete list of voices supported by Google Cloud TTS is available [here](https://cloud.google.com/text-to-speech/docs/voices). For Bhashini, please check the (demo)[https://tts.bhashini.ai/demo/].
